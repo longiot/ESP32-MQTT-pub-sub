@@ -6,8 +6,8 @@
 // ============== CẤU HÌNH ==============
 const int arletLED = 2;
 
-const char* ssid = "Lng";
-const char* password = "17122004";
+const char* ssid = "GREENFEED Guest";
+const char* password = "";
 
 const char* mqtt_server = "broker.hivemq.com";
 const int mqtt_port = 1883;
@@ -15,10 +15,21 @@ const char* mqtt_topic = "GF/ESP32/DATA";
 const char* mqtt_sub = "esp32/control";
 
 // ============== THÔNG SỐ CẢM BIẾN ==============
-float Temp = 25.5;
-float DO = 6.8;
-float pH = 7.2;
+float Temp = 27;
+float DO = 7.0;
+float pH = 7.5;
 bool ledStatus = false;
+
+// Hàm cập nhật nhiệt độ giả lập
+void updateSimulatedTemp() {
+  // Tạo sự thay đổi nhỏ ngẫu nhiên (-0.5 đến +0.5)
+  float change = (random(-50, 51)) / 100.0;
+  Temp += change;
+  
+  // Giới hạn nhiệt độ trong khoảng 24-30
+  if (Temp > 30) Temp = 30;
+  if (Temp < 24) Temp = 24;
+}
 
 // ============== MQTT CLIENT ==============
 WiFiClient espClient;
@@ -153,6 +164,8 @@ void loop() {
   static unsigned long lastSend = 0;
   if (millis() - lastSend >= 10000) {
     lastSend = millis();
+    // Cập nhật nhiệt độ giả lập
+    updateSimulatedTemp();
     sendData();
   }
   delay(1);
